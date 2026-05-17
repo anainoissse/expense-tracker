@@ -1,0 +1,201 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f0f2f5;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+
+#root {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+}
+
+/* Заголовок */
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #1a1a2e;
+}
+
+h1 + p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 32px;
+}
+
+h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+/* Форма */
+.expensesForm {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.expensesForm__label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.expensesForm__input,
+.expensesForm__select {
+  padding: 10px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #1a1a2e;
+  background: #f9fafb;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.expensesForm__input:focus,
+.expensesForm__select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  background: #fff;
+}
+
+.buttonSubmit {
+  align-self: flex-start;
+  padding: 10px 24px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.buttonSubmit:hover {
+  background: #4f46e5;
+}
+
+.buttonSubmit:active {
+  transform: scale(0.97);
+}
+
+/* Список расходов */
+.expensesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.expenseItem {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.expenseItem__sum {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  white-space: nowrap;
+}
+
+.expenseItem__category {
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #ede9fe;
+  color: #6366f1;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.expenseItem__note {
+  font-size: 0.9rem;
+  color: #6b7280;
+  flex: 1;
+}
+
+.buttonDelete {
+  margin-left: auto;
+  padding: 6px 14px;
+  background: transparent;
+  color: #ef4444;
+  border: 1.5px solid #fca5a5;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.buttonDelete:hover {
+  background: #fee2e2;
+}
+
+/* Итоги */
+.totalList {
+  list-style: none;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+
+.totalList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.totalList li:last-child {
+  border-bottom: none;
+}
+
+.totalList__amount {
+  font-weight: 700;
+  color: #6366f1;
+}
+
+.totalList li:has(.totalList__amount:not(:empty)) .totalList__amount {
+  color: #6366f1;
+}
+
+/* Ошибка валидации формы */
+.formError {
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 4px;
+}
