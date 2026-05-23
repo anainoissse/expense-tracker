@@ -1,16 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 import ExpenseItem from './ExpenseItem';
 import './App.css';
+import type { Category, Expense } from './types'
 
-const CATEGORIES = ['Супермаркеты', 'Перекусы', 'Транспорт', 'Сети', 'Развлечения', 'Быт', 'Одежда', 'Разное'];
+
+const CATEGORIES = ['Супермаркеты', 'Перекусы', 'Транспорт', 'Сети', 'Развлечения', 'Быт', 'Одежда', 'Разное'] as const;
 
 const App = () => {
-  const [expenses, setExpenses] = useState(() => {
+  const [expenses, setExpenses] = useState<Expense[]>(() => {
     const saved = localStorage.getItem('expenses')
-    return saved ? JSON.parse(saved) : []
+    return saved ? JSON.parse(saved) as Expense[] : []
   });
   const [sum, setSum] = useState('');
-  const [category, setCategory] = useState(CATEGORIES[0]);
+  const [category, setCategory] = useState<Category>(CATEGORIES[0]);
   const [note, setNote] = useState('');
   const [error, setError] = useState('');
 
@@ -18,12 +21,13 @@ const App = () => {
     localStorage.setItem('expenses', JSON.stringify(expenses))
   }, [expenses])
 
-  const totalByCategory = expenses.reduce((acc, expense) => ({
+  const totalByCategory = expenses.reduce<Record<Category, number>>((acc, expense) => ({
     ...acc,
     [expense.category]: acc[expense.category] + expense.sum
-  }), Object.fromEntries(CATEGORIES.map(cat => [cat, 0])))
+  }), Object.fromEntries(CATEGORIES.map(cat => [cat, 0])) as Record<Category, number>
+)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!sum || Number(sum)<=0) {
       setError('Введите корректную сумму')
@@ -36,7 +40,7 @@ const App = () => {
     setCategory(CATEGORIES[0])
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = (id:number) => {
     setExpenses(expenses.filter(expense => expense.id !== id))
   }
 
@@ -64,7 +68,7 @@ const App = () => {
             name="category"
             className="expensesForm__select"
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => setCategory(e.target.value as Category)}
           >
             {CATEGORIES.map((cat) => (<option key={cat} value={cat}>{cat}</option>))}
           </select>
