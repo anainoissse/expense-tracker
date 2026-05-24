@@ -5,6 +5,7 @@ export interface Expense {
     id: number;
     sum: number;
     category: Category;
+    date: string; // ISO date "YYYY-MM-DD"
     note?: string;
 }
 

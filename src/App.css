@@ -176,11 +176,7 @@ h2 {
   margin-bottom: 36px;
 }
 
-/* Пустое состояние — чисто CSS, без правки JSX.
-   Псевдо-элемент ::before появится, только если <div> вообще не имеет дочерних элементов. */
-.expensesList:empty::before {
-  content: "Пока пусто. Добавь первый расход выше ↑";
-  display: block;
+.expensesList__empty {
   text-align: center;
   padding: 32px 16px;
   color: #9ca3af;
@@ -188,6 +184,7 @@ h2 {
   background: #fff;
   border-radius: 14px;
   border: 1.5px dashed #e5e7eb;
+  margin-bottom: 36px;
 }
 
 .expenseItem {
