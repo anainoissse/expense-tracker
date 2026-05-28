@@ -21,6 +21,11 @@ const moneyFormatter = new Intl.NumberFormat('ru-RU', {
   maximumFractionDigits: 0,
 }) 
 
+const monthFormatter = new Intl.DateTimeFormat('ru-RU', {
+  month: 'long',
+  year: 'numeric'
+})
+
 const App = () => {
   const [expenses, setExpenses] = useState<Expense[]>(() => {
     const saved = localStorage.getItem('expenses')
@@ -40,11 +45,24 @@ const App = () => {
     ...acc,
     [expense.category]: acc[expense.category] + expense.sum
   }), Object.fromEntries(CATEGORIES.map(cat => [cat, 0])) as Record<Category, number>
-)
+  )
 
   const totalSpent = expenses.reduce(
     (acc, expense) => acc + expense.sum,
     0
+  )
+
+  const sortedExpenses = [...expenses].sort((a, b) => {
+    const byDate = b.date.localeCompare(a.date)
+    return byDate !== 0 ? byDate : b.id - a.id
+  })
+
+  const groupedByMonth = sortedExpenses.reduce<Record<string, Expense[]>>((acc, expense) => {
+    const key = expense.date.slice(0, 7)
+    if (!acc[key]) acc[key] = []
+    acc[key].push(expense)
+    return acc
+  }, {}
   )
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -131,9 +149,22 @@ const App = () => {
         <p className="expensesList__empty">Пока пусто. Добавь первый расход выше ↑</p>
       ) : (
       <div className="expensesList">
-        {expenses.map((expense) => (
-          <ExpenseItem key={expense.id} expense={expense} onDelete={handleDelete} />
-        ))}
+
+        {Object.keys(groupedByMonth)
+          .sort((a, b) => b.localeCompare(a))
+          .map((monthKey) =>(
+            <section key={monthKey}>
+                <h3>{monthFormatter.format(new Date(`${monthKey}-01`))}</h3>
+                {groupedByMonth[monthKey].map((expense) => (
+                  <ExpenseItem key={expense.id} expense={expense} onDelete={handleDelete} />
+                ))}
+            </section>
+          )
+
+          )
+        }
+
+
       </div>
       )}
 

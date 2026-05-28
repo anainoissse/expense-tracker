@@ -41,6 +41,29 @@ h2 {
   margin-bottom: 14px;
 }
 
+/* Блок «Всего потрачено» — главный KPI, градиентная карточка */
+.totalSpent {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border-radius: 18px;
+  padding: 22px 26px;
+  margin-bottom: 36px;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.28);
+}
+
+.totalSpent h2 {
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 6px;
+}
+
+.totalSpent__amount {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---- Двухколоночная раскладка на десктопе ----
    В App.tsx корневой <div> внутри #root не имеет класса,
    поэтому навешиваю grid прямо на него селектором #root > div.
@@ -53,37 +76,42 @@ h2 {
     column-gap: 32px;
     align-items: start;
   }
-  /* Заголовок и подзаголовок — на всю ширину сверху */
+  /* Заголовок и подзаголовок — на всю ширину (rows 1–2 авто) */
   #root > div > h1,
   #root > div > h1 + p {
     grid-column: 1 / -1;
   }
-  /* Форма — слева */
+  /* «Всего потрачено» — главный KPI, на всю ширину под шапкой (row 3) */
+  #root > div > .totalSpent {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+  /* Левая колонка: форма (row 4), заголовок и список расходов (rows 5–6) */
   #root > div > .expensesForm {
     grid-column: 1;
+    grid-row: 4;
   }
-  /* h2 "Расходы" — слева, под формой */
   #root > div > h2:nth-of-type(1) {
     grid-column: 1;
+    grid-row: 5;
   }
-  /* Список расходов — слева */
   #root > div > .expensesList {
     grid-column: 1;
+    grid-row: 6;
   }
-  /* h2 "Суммарно" и .totalList кладу в ОДНУ ячейку правой колонки.
-     align-self: start — оба прижаты к верху row 3, не растягиваются.
+  /* h2 "Суммарно" и .totalList кладу в ОДНУ ячейку правой колонки (rows 4–6).
+     align-self: start — оба прижаты к верху, не растягиваются.
      totalList сдвигаю вниз margin-top'ом, чтобы не перекрывать h2.
-     Без обёртки в JSX это единственный способ держать их рядом,
-     не наследуя высоту формы из левой колонки. */
+     Без обёртки в JSX это единственный способ держать их рядом. */
   #root > div > h2:nth-of-type(2) {
     grid-column: 2;
-    grid-row: 3 / span 3;
+    grid-row: 4 / span 3;
     align-self: start;
     margin-bottom: 0;
   }
   #root > div > .totalList {
     grid-column: 2;
-    grid-row: 3 / span 3;
+    grid-row: 4 / span 3;
     align-self: start;
     margin-top: 32px; /* высота h2 (~19px) + воздух */
     position: sticky;
@@ -168,12 +196,31 @@ h2 {
   transform: scale(0.98);
 }
 
-/* Список расходов */
+/* Список расходов — теперь содержит секции по месяцам */
 .expensesList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 24px;
   margin-bottom: 36px;
+}
+
+/* Секция одного месяца */
+.expensesList > section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Заголовок месяца */
+.expensesList > section > h3 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 2px;
 }
 
 .expensesList__empty {
