@@ -86,32 +86,36 @@ h2 {
     grid-column: 1 / -1;
     grid-row: 3;
   }
-  /* Левая колонка: форма (row 4), заголовок и список расходов (rows 5–6) */
+  /* Левая колонка: форма (row 4), фильтр (row 5), заголовок и список (rows 6–7) */
   #root > div > .expensesForm {
     grid-column: 1;
     grid-row: 4;
   }
-  #root > div > h2:nth-of-type(1) {
+  #root > div > .listControls {
     grid-column: 1;
     grid-row: 5;
   }
-  #root > div > .expensesList {
+  #root > div > h2:nth-of-type(1) {
     grid-column: 1;
     grid-row: 6;
   }
-  /* h2 "Суммарно" и .totalList кладу в ОДНУ ячейку правой колонки (rows 4–6).
+  #root > div > .expensesList {
+    grid-column: 1;
+    grid-row: 7;
+  }
+  /* h2 "Суммарно" и .totalList кладу в ОДНУ ячейку правой колонки (rows 4–7).
      align-self: start — оба прижаты к верху, не растягиваются.
      totalList сдвигаю вниз margin-top'ом, чтобы не перекрывать h2.
      Без обёртки в JSX это единственный способ держать их рядом. */
   #root > div > h2:nth-of-type(2) {
     grid-column: 2;
-    grid-row: 4 / span 3;
+    grid-row: 4 / span 4;
     align-self: start;
     margin-bottom: 0;
   }
   #root > div > .totalList {
     grid-column: 2;
-    grid-row: 4 / span 3;
+    grid-row: 4 / span 4;
     align-self: start;
     margin-top: 32px; /* высота h2 (~19px) + воздух */
     position: sticky;
@@ -194,6 +198,34 @@ h2 {
 
 .buttonSubmit:active {
   transform: scale(0.98);
+}
+
+/* Панель управления списком — фильтры, в перспективе сортировки */
+.listControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.listControls select {
+  flex: 1;
+  max-width: 280px;
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #1a1a2e;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.listControls select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 /* Список расходов — теперь содержит секции по месяцам */

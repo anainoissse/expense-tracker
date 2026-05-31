@@ -9,3 +9,5 @@ export interface Expense {
     note?: string;
 }
 
+export type Filter = Category | 'all'
+

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
+import type { ReactElement } from 'react'
 import ExpenseItem from './ExpenseItem';
 import './App.css';
-import type { Category, Expense } from './types'
+import type { Category, Expense, Filter } from './types'
 
 
 const CATEGORIES = ['Супермаркеты', 'Перекусы', 'Транспорт', 'Сети', 'Развлечения', 'Быт', 'Одежда', 'Разное'] as const;
@@ -36,6 +37,7 @@ const App = () => {
   const [note, setNote] = useState('');
   const [date, setDate] = useState(getTodayISO());
   const [error, setError] = useState('');
+  const [filter, setFilter] = useState<Filter>('all');
 
   useEffect(() => {
     localStorage.setItem('expenses', JSON.stringify(expenses))
@@ -52,7 +54,11 @@ const App = () => {
     0
   )
 
-  const sortedExpenses = [...expenses].sort((a, b) => {
+  const filteredExpenses  = filter === 'all'
+    ? expenses 
+    : expenses.filter(e => e.category === filter)
+
+  const sortedExpenses = [...filteredExpenses].sort((a, b) => {
     const byDate = b.date.localeCompare(a.date)
     return byDate !== 0 ? byDate : b.id - a.id
   })
@@ -65,10 +71,25 @@ const App = () => {
   }, {}
   )
 
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!sum || Number(sum)<=0) {
-      setError('Введите корректную сумму')
+    const numericSum = Number(sum)
+
+    if (!sum) {
+      setError('Введите сумму')
+      return
+    }
+    if (Number.isNaN(numericSum)) {
+      setError('Сумма должна быть числом')
+      return
+    }
+    if (numericSum <= 0) {
+      setError('Сумма должна быть больше нуля')
+      return
+    }
+    if (numericSum > 1000000) {
+      setError('Слишком большая сумма')
       return
     }
     setError('')
@@ -81,6 +102,28 @@ const App = () => {
 
   const handleDelete = (id:number) => {
     setExpenses(expenses.filter(expense => expense.id !== id))
+  }
+
+  let listContent: ReactElement
+  if (expenses.length === 0) {
+    listContent = <p className="expensesList__empty">Пока пусто. Добавь первый расход выше ↑</p>
+  } else if (filteredExpenses.length === 0) {
+    listContent = <p className="expensesList__empty">По выбранной категории расходов нет</p>
+  } else {
+    listContent = <div className="expensesList">
+
+        {Object.keys(groupedByMonth)
+          .sort((a, b) => b.localeCompare(a))
+          .map((monthKey) =>(
+            <section key={monthKey}>
+                <h3>{monthFormatter.format(new Date(`${monthKey}-01`))}</h3>
+                {groupedByMonth[monthKey].map((expense) => (
+                  <ExpenseItem key={expense.id} expense={expense} onDelete={handleDelete} />
+                ))}
+            </section>
+          ))
+        }
+      </div>
   }
 
   return (
@@ -96,7 +139,10 @@ const App = () => {
             className="expensesForm__input expensesForm__input-sum"
             type="number"
             value={sum}
-            onChange={(e) => setSum(e.target.value)}
+            onChange={(e) => {
+              setSum(e.target.value)
+              if (error) setError('')
+            }}
           />
           {error && <p className="formError">{error}</p>}
         </label>
@@ -144,29 +190,15 @@ const App = () => {
           <p className="totalSpent__amount">{ moneyFormatter.format(totalSpent) }</p>
         </section>
 
-      <h2>Расходы</h2>
-      {expenses.length === 0 ? (
-        <p className="expensesList__empty">Пока пусто. Добавь первый расход выше ↑</p>
-      ) : (
-      <div className="expensesList">
-
-        {Object.keys(groupedByMonth)
-          .sort((a, b) => b.localeCompare(a))
-          .map((monthKey) =>(
-            <section key={monthKey}>
-                <h3>{monthFormatter.format(new Date(`${monthKey}-01`))}</h3>
-                {groupedByMonth[monthKey].map((expense) => (
-                  <ExpenseItem key={expense.id} expense={expense} onDelete={handleDelete} />
-                ))}
-            </section>
-          )
-
-          )
-        }
-
-
+      <div className="listControls">
+        <select value={filter} onChange={(e) => setFilter(e.target.value as Filter)}>
+          <option value="all">Все категории</option>
+          {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+        </select>
       </div>
-      )}
+
+      <h2>Расходы</h2>
+      {listContent}
 
       <h2>Суммарно</h2>
       
