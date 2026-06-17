@@ -12,9 +12,120 @@ body {
 }
 
 #root {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+/* Боковая панель навигации (desktop). На мобильном становится верхним баром — см. media-query ниже */
+.appHeader {
+  width: 240px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+  color: #fff;
+  padding: 36px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  align-self: flex-start;
+  overflow-y: auto;
+  box-shadow: 4px 0 24px rgba(15, 16, 36, 0.08);
+}
+
+.appHeader::before {
+  content: 'Трекер';
+  display: block;
+  padding: 0 8px 24px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 18px;
+}
+
+.appNav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.appNav__link {
+  position: relative;
+  text-decoration: none;
+  padding: 12px 14px 12px 22px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  transition: background 0.15s, color 0.15s;
+}
+
+.appNav__link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.appNav__link--active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* Жёлтая метка слева для активной ссылки — визуальный акцент */
+.appNav__link--active::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 30%;
+  bottom: 30%;
+  width: 3px;
+  border-radius: 3px;
+  background: #fbbf24;
+}
+
+/* Основная область контента — центрирована, в неё попадает <Outlet /> */
+main {
+  flex: 1;
+  min-width: 0;
   max-width: 1040px;
   margin: 0 auto;
-  padding: 40px 20px 80px;
+  padding: 40px 24px 80px;
+  width: 100%;
+}
+
+/* Мобильный: сайдбар уезжает наверх, ссылки в ряд */
+@media (max-width: 767px) {
+  #root {
+    flex-direction: column;
+  }
+  .appHeader {
+    width: auto;
+    height: auto;
+    position: relative;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #4338ca, #6366f1);
+    box-shadow: 0 2px 12px rgba(15, 16, 36, 0.08);
+  }
+  .appHeader::before {
+    display: none;
+  }
+  .appNav {
+    flex-direction: row;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .appNav__link {
+    flex: 1;
+    text-align: center;
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+  .appNav__link--active::before {
+    display: none;
+  }
+  main {
+    padding: 24px 16px 80px;
+  }
 }
 
 /* Заголовок */
@@ -64,63 +175,9 @@ h2 {
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- Двухколоночная раскладка на десктопе ----
-   В App.tsx корневой <div> внутри #root не имеет класса,
-   поэтому навешиваю grid прямо на него селектором #root > div.
-   Дочерние элементы распределяются по колонкам через grid-column / grid-row.
-   На мобильном — обычный поток (без media — без grid). */
-@media (min-width: 900px) {
-  #root > div {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
-    column-gap: 32px;
-    align-items: start;
-  }
-  /* Заголовок и подзаголовок — на всю ширину (rows 1–2 авто) */
-  #root > div > h1,
-  #root > div > h1 + p {
-    grid-column: 1 / -1;
-  }
-  /* «Всего потрачено» — главный KPI, на всю ширину под шапкой (row 3) */
-  #root > div > .totalSpent {
-    grid-column: 1 / -1;
-    grid-row: 3;
-  }
-  /* Левая колонка: форма (row 4), фильтр (row 5), заголовок и список (rows 6–7) */
-  #root > div > .expensesForm {
-    grid-column: 1;
-    grid-row: 4;
-  }
-  #root > div > .listControls {
-    grid-column: 1;
-    grid-row: 5;
-  }
-  #root > div > h2:nth-of-type(1) {
-    grid-column: 1;
-    grid-row: 6;
-  }
-  #root > div > .expensesList {
-    grid-column: 1;
-    grid-row: 7;
-  }
-  /* h2 "Суммарно" и .totalList кладу в ОДНУ ячейку правой колонки (rows 4–7).
-     align-self: start — оба прижаты к верху, не растягиваются.
-     totalList сдвигаю вниз margin-top'ом, чтобы не перекрывать h2.
-     Без обёртки в JSX это единственный способ держать их рядом. */
-  #root > div > h2:nth-of-type(2) {
-    grid-column: 2;
-    grid-row: 4 / span 4;
-    align-self: start;
-    margin-bottom: 0;
-  }
-  #root > div > .totalList {
-    grid-column: 2;
-    grid-row: 4 / span 4;
-    align-self: start;
-    margin-top: 32px; /* высота h2 (~19px) + воздух */
-    position: sticky;
-    top: 24px;
-  }
+/* Стандартный отступ под заголовком страницы */
+main > div > h1 {
+  margin-bottom: 24px;
 }
 
 /* Форма */
