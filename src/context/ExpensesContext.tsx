@@ -4,6 +4,7 @@ import { Expense } from "../types";
 export interface ExpensesContextValue {
     expenses: Expense[],
     addExpense: (data: Omit<Expense, 'id'>) => void,
+    updateExpense: (id: number, data: Omit<Expense, 'id'>) => void,
     deleteExpense: (id: number) => void
 }
 
@@ -21,12 +22,21 @@ export const ExpensesProvider = ({ children }: { children: ReactNode }) => {
   const addExpense = (data: Omit<Expense, 'id'>) => {
     setExpenses(prev => [...prev, { id: Date.now(), ...data }])
   }
+
+  const updateExpense = (id: number, data: Omit<Expense, 'id'>) => {
+    setExpenses(prev =>
+      prev.map(expense =>
+        expense.id === id ? { id, ...data } : expense,
+      ),
+    )
+  }
+
   const deleteExpense = (id: number) => {
     setExpenses(prev => prev.filter(e => e.id !== id))
   }
 
   return (
-    <ExpensesContext.Provider value={{ expenses, addExpense, deleteExpense }}>
+    <ExpensesContext.Provider value={{ expenses, addExpense, updateExpense, deleteExpense }}>
       {children}
     </ExpensesContext.Provider>
   )

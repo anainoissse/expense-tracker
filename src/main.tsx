@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router'
 import RootLayout from './layouts/RootLayout'
 import HomePage from './pages/HomePage'
 import AddExpensePage from './pages/AddExpensePage'
+import ExpensePage from './pages/ExpensePage'
 import StatsPage from './pages/StatsPage'
 import NotFoundPage from './pages/NotFoundPage'
 import { ExpensesProvider } from './context/ExpensesContext'
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'add', element: <AddExpensePage /> },
+      { path: 'expense/:id', element: <ExpensePage /> },
       { path: 'stats', element: <StatsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],

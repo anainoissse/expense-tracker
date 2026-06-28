@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import type { Expense } from './types'
 import { moneyFormatter } from './utils'
 
@@ -19,7 +20,14 @@ const ExpenseItem = ({ expense, onDelete }: ExpenseItemProps) => {
       <span className="expenseItem__category">{expense.category}</span>
       <span className="expenseItem__date">{dateFormatter.format(new Date(expense.date))}</span>
       {expense.note && <span className="expenseItem__note">{expense.note}</span>}
-      <button className="buttonDelete" onClick={() => onDelete(expense.id)}>Удалить</button>
+      <div className="expenseItem__actions">
+        <Link className="buttonEdit" to={`/expense/${expense.id}`}>
+          Редактировать
+        </Link>
+        <button className="buttonDelete" onClick={() => onDelete(expense.id)}>
+          Удалить
+        </button>
+      </div>
     </div>
   )
 }

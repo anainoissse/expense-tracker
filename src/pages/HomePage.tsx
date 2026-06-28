@@ -1,4 +1,5 @@
-import { useState, type ReactElement } from 'react'
+import { type ReactElement } from 'react'
+import { useSearchParams } from 'react-router'
 import ExpenseItem from '../ExpenseItem'
 import { useExpenses } from '../context/ExpensesContext'
 import { CATEGORIES } from '../utils'
@@ -11,7 +12,25 @@ const monthFormatter = new Intl.DateTimeFormat('ru-RU', {
 
 const HomePage = () => {
   const { expenses, deleteExpense } = useExpenses()
-  const [filter, setFilter] = useState<Filter>('all')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const categoryParam = searchParams.get('category')
+  const filter: Filter =
+    categoryParam && CATEGORIES.includes(categoryParam as Category)
+      ? (categoryParam as Category)
+      : 'all'
+
+  const handleFilterChange = (value: Filter) => {
+    const nextSearchParams = new URLSearchParams(searchParams)
+
+    if (value === 'all') {
+      nextSearchParams.delete('category')
+    } else {
+      nextSearchParams.set('category', value)
+    }
+
+    setSearchParams(nextSearchParams)
+  }
 
   const filteredExpenses =
     filter === 'all' ? expenses : expenses.filter((e) => e.category === filter)
@@ -70,7 +89,7 @@ const HomePage = () => {
       <div className="listControls">
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value as Filter)}
+          onChange={(e) => handleFilterChange(e.target.value as Filter)}
         >
           <option value="all">Все категории</option>
           {CATEGORIES.map((cat) => (
