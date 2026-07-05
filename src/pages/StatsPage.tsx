@@ -1,5 +1,7 @@
+import CategoryDonut from '../components/CategoryDonut'
+import CategoryBars from '../components/CategoryBars'
 import { useExpenses } from '../context/ExpensesContext'
-import { CATEGORIES, moneyFormatter } from '../utils'
+import { CATEGORIES } from '../utils'
 import type { Category } from '../types'
 
 const StatsPage = () => {
@@ -16,27 +18,24 @@ const StatsPage = () => {
     >,
   )
 
+  const entries = (Object.entries(totalByCategory) as [Category, number][])
+    .filter(([, sum]) => sum > 0)
+    .map(([category, sum]) => ({ category, sum }))
+    .sort((a, b) => b.sum - a.sum)
+
   return (
     <div>
       <h1>Статистика</h1>
 
-      {expenses.length === 0 ? (
+      {entries.length === 0 ? (
         <p className="expensesList__empty">
           Пока пусто. Добавь расходы — и здесь появится разбивка по категориям.
         </p>
       ) : (
-        <ul className="totalList">
-          {Object.entries(totalByCategory)
-            .filter(([_cat, total]) => total > 0)
-            .map(([cat, total]) => (
-              <li key={cat}>
-                <span>{cat}</span>
-                <span className="totalList__amount">
-                  {moneyFormatter.format(total)}
-                </span>
-              </li>
-            ))}
-        </ul>
+        <div className="statsGrid">
+          <CategoryDonut entries={entries} />
+          <CategoryBars entries={entries} />
+        </div>
       )}
     </div>
   )

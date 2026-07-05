@@ -93,38 +93,87 @@ main {
   width: 100%;
 }
 
-/* Мобильный: сайдбар уезжает наверх, ссылки в ряд */
+/* Гамбургер — виден только на мобильном (см. media-query ниже) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 20;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: #fff;
+  color: #4338ca;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(15, 16, 36, 0.12);
+  transition: transform 0.1s, box-shadow 0.15s;
+}
+
+.hamburger:hover {
+  box-shadow: 0 6px 18px rgba(15, 16, 36, 0.16);
+}
+
+.hamburger:active {
+  transform: scale(0.96);
+}
+
+/* Затемнение позади открытого сайдбара на мобильном */
+.navBackdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 16, 36, 0.45);
+  z-index: 24;
+  animation: fadeIn 0.18s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Мобильный: сайдбар живёт слева и выезжает по кнопке */
 @media (max-width: 767px) {
   #root {
     flex-direction: column;
   }
+
+  .hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .navBackdrop--visible {
+    display: block;
+  }
+
   .appHeader {
-    width: auto;
-    height: auto;
-    position: relative;
-    padding: 14px 16px;
-    background: linear-gradient(135deg, #4338ca, #6366f1);
-    box-shadow: 0 2px 12px rgba(15, 16, 36, 0.08);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 260px;
+    padding: 24px 16px;
+    z-index: 25;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
   }
-  .appHeader::before {
-    display: none;
+
+  .appHeader--open {
+    transform: translateX(0);
   }
-  .appNav {
-    flex-direction: row;
-    gap: 4px;
-    overflow-x: auto;
-  }
-  .appNav__link {
-    flex: 1;
-    text-align: center;
-    padding: 10px 12px;
-    white-space: nowrap;
-  }
-  .appNav__link--active::before {
-    display: none;
-  }
+
   main {
-    padding: 24px 16px 80px;
+    padding: 76px 16px 80px;
   }
 }
 
@@ -500,4 +549,228 @@ main > div > h1 {
   font-size: 0.8rem;
   font-weight: 500;
   margin-top: 4px;
+}
+
+/* ----- Статистика: донат + горизонтальные бары ----- */
+.statsGrid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  margin-top: 24px;
+}
+
+@media (min-width: 900px) {
+  .statsGrid {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 48px;
+  }
+  .categoryDonut {
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .categoryBars {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* Донат */
+.categoryDonut {
+  position: relative;
+  width: 220px;
+}
+
+.categoryDonut__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.categoryDonut__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
+}
+
+.categoryDonut__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.categoryDonut__value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f1024;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Горизонтальные бары */
+.categoryBars {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.categoryBars__item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.categoryBars__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.categoryBars__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+}
+
+.categoryBars__name {
+  color: #374151;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.categoryBars__amount {
+  font-weight: 700;
+  color: #0f1024;
+  font-variant-numeric: tabular-nums;
+}
+
+.categoryBars__percent {
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+  min-width: 52px;
+  text-align: right;
+  font-size: 0.88rem;
+}
+
+.categoryBars__track {
+  background: #f4f5f9;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.categoryBars__fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* ----- Модальное окно подтверждения ----- */
+.confirmDialog__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 16, 36, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+  animation: fadeIn 0.18s ease;
+}
+
+.confirmDialog {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 28px 20px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 24px 60px rgba(15, 16, 36, 0.2);
+  animation: dialogPop 0.18s ease;
+}
+
+@keyframes dialogPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.confirmDialog__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f1024;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.confirmDialog__message {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.confirmDialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.buttonSecondary {
+  padding: 10px 20px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.buttonSecondary:hover {
+  background: #f4f5f9;
+  border-color: #d1d5db;
+}
+
+.buttonDanger {
+  padding: 10px 20px;
+  border: none;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+  transition: background 0.15s;
+}
+
+.buttonDanger:hover {
+  background: #dc2626;
 }

@@ -1,12 +1,86 @@
-# React + Vite
+# Трекер расходов
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Пет-проект для отработки современного React-стека.
+ SPA с многостраничной навигацией, реактивным списком расходов и статистикой по категориям. Данные хранятся локально (`localStorage`), UI полностью на TypeScript в strict-mode.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Что умеет
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Многостраничное SPA** — `/`, `/add`, `/expense/:id`, `/stats`, 404.
+- **Учёт расходов** — сумма, категория, дата, описание. Валидация формы (пусто / не число / <= 0 / > 1 000 000) с индивидуальными сообщениями.
+- **Редактирование расхода** через страницу `/expense/:id` с преинициализацией формы через `key`-remount.
+- **Фильтр по категории** — состояние хранится в URL (`?category=...`), поэтому shareable, работает с браузерной кнопкой «Назад» и переживает перезагрузку.
+- **Группировка списка по месяцам** с локализованными заголовками через `Intl.DateTimeFormat`.
+- **Иммутабельная сортировка** с тай-брейком по `id` (в пределах одного дня новые сверху).
+- **Статистика по категориям** — суммы, скрытие нулевых.
+- **Главный KPI «Всего потрачено»** — виден на любой странице, живёт в Layout.
+- **Empty state с двумя вариантами** — «пока пусто» и «по фильтру ничего нет».
+- **Персистентность** — все расходы автоматически сохраняются в `localStorage`.
+- **Адаптив** — на десктопе тёмный сайдбар со стеком навигации, на мобилке — сворачивается в горизонтальный бар / гамбургер.
+
+---
+
+## Стек
+
+| Слой | Технологии |
+|---|---|
+| Язык | **TypeScript** (strict-mode, дженерики, union literals, `Omit` / `Partial` / `Record`) |
+| Каркас | **React 19**, **React Router 7** (`createBrowserRouter`, вложенные маршруты, `<Outlet />`, `useParams`, `useNavigate`, `useSearchParams`) |
+| Управление стейтом | **React Context API** + custom hook `useExpenses()` |
+| Локализация | Нативный `Intl.NumberFormat` / `Intl.DateTimeFormat` (`ru-RU`) |
+| Сборка | **Vite 7** (esbuild под капотом) |
+| Стилизация | Ванильный CSS + BEM (Tailwind CSS — впереди по плану) |
+
+---
+
+## Стрктура репозитория
+
+```
+src/
+├── main.tsx                 # RouterProvider + ExpensesProvider
+├── App.css                  # глобальные стили (BEM)
+├── types.ts                 # доменные типы: Expense, Category, Filter
+├── utils.ts                 # общие константы и форматеры
+├── ExpenseForm.tsx          # переиспользуемая форма (создание + редактирование)
+├── ExpenseItem.tsx          # карточка расхода
+├── context/
+│   └── ExpensesContext.tsx  # provider + useExpenses() hook
+├── layouts/
+│   └── RootLayout.tsx       # сайдбар + KPI + <Outlet />
+└── pages/
+    ├── HomePage.tsx         # список, фильтр в URL, группировка
+    ├── AddExpensePage.tsx   # добавление
+    ├── ExpensePage.tsx      # /expense/:id — редактирование
+    ├── StatsPage.tsx        # разбивка по категориям
+    └── NotFoundPage.tsx     # 404
+```
+
+---
+
+## Локальный запуск
+
+Требуется Node.js 20+ и npm.
+
+```
+git clone https://github.com/<логин>/expense-tracker.git
+cd expense-tracker
+npm install
+npm run dev
+```
+
+Приложение поднимется на `http://localhost:5173`.
+
+Полезные скрипты:
+
+- `npm run dev` — dev-сервер с HMR.
+- `npm run build` — production-сборка в `dist/`.
+- `npm run preview` — локальный статический сервер для проверки прод-сборки.
+- `npx tsc --noEmit` — проверка типов без генерации.
+
+---
+
+## Почему проект такой
+
+Основная цель — не готовый продукт, а платформа для последовательного освоения индустриальных паттернов. Каждый рефакторинг сохраняется в git-историю отдельным коммитом, чтобы можно было проследить эволюцию: от одностраничного `useState`-приложения до Multi-page SPA с Context, а потом до полноценного стейт-менеджера и сетевого слоя.

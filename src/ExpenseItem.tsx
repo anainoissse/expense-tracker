@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Link } from 'react-router'
 import type { Expense } from './types'
 import { moneyFormatter } from './utils'
+import ConfirmDialog from './components/ConfirmDialog'
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   day: '2-digit',
@@ -9,27 +11,54 @@ const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
 })
 
 interface ExpenseItemProps {
-  expense: Expense;
-  onDelete: (id: number) => void;
+  expense: Expense
+  onDelete: (id: number) => void
 }
 
 const ExpenseItem = ({ expense, onDelete }: ExpenseItemProps) => {
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+
+  const handleConfirm = () => {
+    setIsConfirmOpen(false)
+    onDelete(expense.id)
+  }
+
   return (
-    <div className="expenseItem">
-      <span className="expenseItem__sum">{ moneyFormatter.format(expense.sum) }</span>
-      <span className="expenseItem__category">{expense.category}</span>
-      <span className="expenseItem__date">{dateFormatter.format(new Date(expense.date))}</span>
-      {expense.note && <span className="expenseItem__note">{expense.note}</span>}
-      <div className="expenseItem__actions">
-        <Link className="buttonEdit" to={`/expense/${expense.id}`}>
-          Редактировать
-        </Link>
-        <button className="buttonDelete" onClick={() => onDelete(expense.id)}>
-          Удалить
-        </button>
+    <>
+      <div className="expenseItem">
+        <span className="expenseItem__sum">{moneyFormatter.format(expense.sum)}</span>
+        <span className="expenseItem__category">{expense.category}</span>
+        <span className="expenseItem__date">{dateFormatter.format(new Date(expense.date))}</span>
+        {expense.note && <span className="expenseItem__note">{expense.note}</span>}
+        <div className="expenseItem__actions">
+          <Link className="buttonEdit" to={`/expense/${expense.id}`}>
+            Редактировать
+          </Link>
+          <button
+            type="button"
+            className="buttonDelete"
+            onClick={() => setIsConfirmOpen(true)}
+          >
+            Удалить
+          </button>
+        </div>
       </div>
-    </div>
+      <ConfirmDialog
+        open={isConfirmOpen}
+        title="Удалить расход?"
+        message={
+          <>
+            {moneyFormatter.format(expense.sum)} — {expense.category}. Это
+            действие нельзя отменить.
+          </>
+        }
+        confirmLabel="Удалить"
+        cancelLabel="Отмена"
+        onConfirm={handleConfirm}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
+    </>
   )
 }
 
-export default ExpenseItem;
+export default ExpenseItem
